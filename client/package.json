@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@hocuspocus/provider": "^3.1.0",
+    "yjs": "^13.6.26"
+  }
+}
