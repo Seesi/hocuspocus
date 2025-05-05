@@ -1,5 +1,5 @@
 import * as Y from "yjs";
-import { HocuspocusProvider, HocuspocusProviderWebsocket} from "@hocuspocus/provider";
+import { HocuspocusProvider} from "@hocuspocus/provider";
 import readline from "readline";
 
 const rl = readline.createInterface({
@@ -13,6 +13,7 @@ const provider = new HocuspocusProvider({
   name: "example-document",
   onConnect() {
     console.log("\n 🔌 Connected to Hocuspocus server...");
+    rl.prompt();
   },
 });
 
