@@ -1,4 +1,3 @@
-import * as Y from "yjs";
 import { HocuspocusProvider} from "@hocuspocus/provider";
 import readline from "readline";
 
@@ -12,7 +11,7 @@ const provider = new HocuspocusProvider({
   url: "ws://127.0.0.1:1234",
   name: "example-document",
   onConnect() {
-    console.log("\n 🔌 Connected to Hocuspocus server...");
+    console.log("\nConnected to Hocuspocus server...");
     rl.prompt();
   },
 });
@@ -22,8 +21,8 @@ const tasks = provider.document.getArray("tasks");
 
 // Optional: Watch for external changes (other clients)
 tasks.observe(() => {
-  console.log("\n♻️  Tasks were modified:");
-  console.log(" 📒 Current tasks:", JSON.stringify(tasks.toArray(), null, 2));
+  console.log("\nTasks were modified:");
+  console.log("Current tasks:", JSON.stringify(tasks.toArray(), null, 2));
 
   // Clear current input line and re-show prompt
   rl.write(null, { ctrl: true, name: 'u' }); // Clears the current line
@@ -32,7 +31,7 @@ tasks.observe(() => {
 
 // Function to ask user for input
 const askForTask = () => {
-  rl.setPrompt("➕ Enter a task (or 'exit'): ");
+  rl.setPrompt("Enter a task (or 'exit'): ");
   rl.prompt();
 
   rl.once("line", (input) => {
