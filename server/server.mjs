@@ -24,10 +24,8 @@ let logger = new Logger({
 
 let redisCache = new Redis({
   host: "127.0.0.1",
-  port: 6379,
+  port: 6379
 });
-
-// Either you go with the database extension or use the onStoreDocument and onLoadDocument hocks
 
 let database = new Database({
   // Return a Promise to retrieve data …
@@ -42,8 +40,13 @@ let database = new Database({
           if (error) {
             reject(error);
           }
-          const data = new Uint8Array(row.data);
-          resolve(data);
+          if (!row) {
+            const newDoc = new Y.Doc();
+            resolve(new Uint8Array(Y.encodeStateAsUpdate(newDoc)));
+          } else {
+            const data = new Uint8Array(row.data);
+            resolve(data);
+          }
         }
       );
     });
@@ -61,31 +64,6 @@ let database = new Database({
   },
 });
 
-const loadFromDatabase = (documentName) => {
-  const row = db?.get(
-    "SELECT data FROM documents WHERE name = ? ORDER BY rowid DESC",
-    documentName
-  );
-  const data = new Uint8Array(row.data);
-  return data;
-};
-const saveToDatabase = async (data, documentName) => {
-  const binaryData = Y.encodeStateAsUpdate(data);
-  db?.run(
-    "INSERT INTO documents (name, data) VALUES (:name, :data) ON CONFLICT(name) DO UPDATE SET data = :data",
-    {
-      ":name": documentName,
-      ":data": binaryData,
-    },
-    (error) => {
-      if (error)
-        console.error(
-          "Error occuried whiles saving document changes #%d",
-          error
-        );
-    }
-  );
-};
 const server = new Server({
   name: "hocuspocus-seesi-01",
   port: 1234,
@@ -93,15 +71,7 @@ const server = new Server({
   debounce: 1000,
   maxDebounce: 30000,
   quiet: false,
-  extensions: [logger, redisCache],
-  async onStoreDocument(data) {
-    // Save to database. Example:
-    saveToDatabase(data.document, data.documentName);
-  },
-
-  async onLoadDocument(data) {
-    return loadFromDatabase(data.documentName) || createInitialDocTemplate();
-  },
+  extensions: [logger, redisCache, database],
   async onConnect({ documentName }) {
     console.log(`Client connected to document: ${documentName}`);
   },
